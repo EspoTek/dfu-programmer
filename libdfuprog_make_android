@@ -1,0 +1,104 @@
+#!/bin/bash
+
+
+#https://stackoverflow.com/questions/1473981/how-to-check-if-a-string-has-spaces-in-bash-shell
+case "$PWD" in  
+     *\ * )
+           echo "Sorry, but GCC cracks the shits if there's a space in the path.  Please try running this script from another folder."
+	   exit
+          ;;
+       *)
+           ;;
+esac
+
+
+
+echo
+echo "Please note that if you're using a 32-bit version of the NDK, you'll need to manually set ANDROID_GCC_DIR in the shell script"
+echo 
+
+#I got sick of typing in my dir every time I tested the script
+if [ -d "/home/esposch/android-ndk-r15c" ]; then
+	NDK_ROOT="/home/esposch/android-ndk-r15c"
+else
+	#Get NDK location
+	echo "Please enter the location of your Android NDK root directory (e.g. '~/android-ndk-r15c')"
+	read NDK_ROOT
+	echo
+fi
+
+#Extracting directories from the NDK root.
+
+#https://stackoverflow.com/questions/3963716/how-to-manually-expand-a-special-variable-ex-tilde-in-bash/27485157#27485157
+#I don't quite understand this.  Need to get good at bash...
+NDK_ROOT="${NDK_ROOT/#\~/$HOME}"
+#This won't work on 32-bit Linux.  
+ANDROID_GCC_DIR="$NDK_ROOT/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin"
+SYSROOT="$NDK_ROOT/platforms/android-16/arch-arm"
+STD_LIBRARY_LOCATION="$SYSROOT/arch-arm/usr/lib"
+
+#Check that the sysroot exists
+echo "Checking for directory $SYSROOT"
+if [ -d "$SYSROOT" ]; then
+	echo "Directory exists!  Continuing..."	
+else
+	echo "Directory does not exist.  Please check for typos."
+	echo "Script cannot continue unless valid NDK directory is provided.  Exiting..."
+	exit
+fi
+
+
+echo
+echo CLEANING...
+echo
+
+#Clean up
+
+make clean
+
+
+echo
+echo CONFIGURING...
+echo
+
+#Configure to make it all using the NDK
+
+export PATH=$ANDROID_GCC_DIR:$PATH
+export CC="arm-linux-androideabi-gcc -fPIC -L$PWD/src/libusb-242 --sysroot=$SYSROOT -llog"
+
+
+./configure --host=arm-linux-androideabi
+
+echo
+echo "PATCHING SOURCE FOR ANDROID..."
+echo
+
+#Fiddle with the source a bit
+
+cp "$PWD/src/altmain/android/main.c" "$PWD/src"
+cp "$PWD/src/altmain/android/main.h" "$PWD/src"
+cp "$PWD/src/altmain/android/dfu.c" "$PWD/src"
+cp "$PWD/src/altmain/android/dfu.h" "$PWD/src"
+
+echo
+echo MAKING OBJECTS...
+echo
+
+#Build dfu-programmer
+
+make
+
+echo
+echo BUILDING SHARED LIBRARY...
+echo
+
+#Glue all of the .o files together
+
+cd src
+
+arm-linux-androideabi-gcc -shared -g -Wall -O2 -L/users/esposch/desktop/dfu-programmer-master/src -o libdfuprog-0.9.so main.o arguments.o atmel.o commands.o dfu.o intel_hex.o stm32.o util.o -L"$PWD/libusb-242" -lusb-1.0 --sysroot="$SYSROOT"
+
+echo
+echo Build complete!!
+echo
+

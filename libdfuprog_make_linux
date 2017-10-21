@@ -1,0 +1,40 @@
+#! /bin/sh
+
+echo
+echo CLEANING...
+echo
+
+make clean
+
+echo
+echo CONFIGURING...
+echo
+
+./configure CC='gcc -fPIC'
+
+echo
+echo "PATCHING SOURCE FOR LINUX..."
+echo
+
+cp "$PWD/src/altmain/desktop/main.c" "$PWD/src"
+cp "$PWD/src/altmain/desktop/main.h" "$PWD/src"
+cp "$PWD/src/altmain/desktop/dfu.c" "$PWD/src"
+cp "$PWD/src/altmain/desktop/dfu.h" "$PWD/src"
+
+echo
+echo MAKING OBJECTS...
+echo
+
+make
+
+echo
+echo BUILDING SHARED LIBRARY...
+echo
+
+cd src
+
+gcc -shared -dl -g -Wall -O2 -o libdfuprog-0.9.so main.o arguments.o atmel.o commands.o dfu.o intel_hex.o stm32.o util.o -lusb-1.0
+
+echo
+echo "Build complete!!  Please check above for any errors."
+echo

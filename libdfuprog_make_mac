@@ -1,0 +1,32 @@
+#! /bin/sh
+
+ECHO
+ECHO CLEANING...
+ECHO
+
+make clean
+
+ECHO
+ECHO CONFIGURING...
+ECHO
+
+./configure CC='gcc-7 -c -fPIC'
+
+ECHO
+ECHO MAKING OBJECTS...
+ECHO
+
+make
+
+ECHO
+ECHO BUILDING SHARED LIBRARY...
+ECHO
+
+cd src
+
+gcc-7 -lusb-1.0 -g -Wall -O2 -dynamiclib -undefined dynamic_lookup -o libdfuprog-0.9.dylib main.o arguments.o atmel.o commands.o dfu.o intel_hex.o stm32.o util.o
+#gcc-7 -g -Wall -O2 -dynamiclib -o libdfuprog-0.9.dylib main.o arguments.o atmel.o commands.o dfu.o intel_hex.o stm32.o util.o
+
+ECHO
+ECHO Build complete!!
+ECHO

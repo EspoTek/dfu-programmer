@@ -1,0 +1,7 @@
+sudo apt-get install automake
+sudo apt-get install autoconf
+sudo apt-get install libusb-1.0
+sudo apt-get install build-essentials
+./bootstrap.sh
+chmod 755 ./libdfuprog_make
+./libdfuprog_make
