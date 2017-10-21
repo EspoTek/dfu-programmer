@@ -1,15 +1,15 @@
-libdfuprog is a fork of dfu-programmer with a bunch of hacky build scripts added that let you run it as a dynamic library.
+libdfuprog is a fork of dfu-programmer with a bunch of hacky build scripts added so you can build it as a dynamic library.
 
 It also adds support for Android, via Martin Marinov/Kuldeep Singh Dhaka's libusb fork (which I need to update to libusb rev. 242, to get Android 7 support).
 
 To build it, run bootstrap.sh, then libdfuprog_make_<your_platform_here>.
-You might need to prerequisites; check the original dfu-programmer page as well as libdfuprog_instructions in this repo.
+You might need some prerequisites; check the original dfu-programmer page as well as libdfuprog_instructions in this repo.
 
-To use it, rename main.h to libdfuprog.h (AFTER building), and then add it to your includes.  Add libdfuprog-0.9.so to your libs.
+After building, rename main.h to libdfuprog.h (AFTER building), and then add it to your includes.  Also don't forget to add libdfuprog-0.9.so to your libs.  :)
 
-You can then feed in your commands to libdfuprog_virtual_cmd().
+You can then make dfu commands by treating libdfuprog_virtual_cmd() as if it were a terminal running dfu-programmer!
 Implementation is  a bit hacky on Android, as it closes the llibusb handle before returning...
-Fortunately it's easy to make another one.
+Fortunately it's easy to make another one!
 
 Check out the androidUsbDriver.cpp and unixUsbDriver.cpp files in my other repo (Labrador) for an example of how to use it:
 https://github.com/EspoTek/Labrador
