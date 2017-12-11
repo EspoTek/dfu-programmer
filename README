@@ -1,6 +1,6 @@
 libdfuprog is a fork of dfu-programmer with a bunch of hacky build scripts added so you can build it as a dynamic library.
 
-It also adds support for Android, via Martin Marinov/Kuldeep Singh Dhaka's libusb fork (which I need to update to libusb rev. 242, to get Android 7 support).
+It also adds support for Android versions 4 and later (including 7 and I think 8), via Vianney le Clément de Saint-Marcq's libusb fork.
 
 To build it, run bootstrap.sh, then libdfuprog_make_<your_platform_here>.
 You might need some prerequisites; check the original dfu-programmer page as well as libdfuprog_instructions in this repo.
